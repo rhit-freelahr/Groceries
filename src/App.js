@@ -138,9 +138,9 @@ function RecipeCard ({recipe}) {
                 }}
               />
               </Inset>
-              <Text as="p" size="3">
-              <Strong>{recipe.name}</Strong>
-              </Text>
+                <Text as="p" size="3">
+                  <Strong>{recipe.name}</Strong>
+                </Text>
             </Card>
           </Box>
         </Dialog.Trigger>
@@ -148,6 +148,20 @@ function RecipeCard ({recipe}) {
             <Dialog.Overlay className='recipe-modal-overlay'>
             <Dialog.Content className='recipe-modal' >
                 <h2>{recipe.name}</h2>
+                <hr/>
+                <h4>Ingredients:</h4>
+                <ul>
+                  {recipe.ingredient.map((ingredient, index) => (
+                      <label>
+                        <input
+                          type="checkbox"
+                          name={`ingredient-${index}`}
+                          value={ingredient}
+                        />
+                        {ingredient}
+                      </label>
+                  ))}
+                </ul>
             </Dialog.Content>
             </Dialog.Overlay>
           </Dialog.Portal>
