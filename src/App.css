@@ -24,6 +24,18 @@
   color: white;
 }
 
+.NavAndContent{
+  justify-content:center;
+  align-items: center;
+  background-color: #faf3ec;
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+}
+.NavButtons{
+  color: black;
+  
+}
+
 .App-link {
   color: #61dafb;
 }

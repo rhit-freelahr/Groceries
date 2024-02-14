@@ -1,0 +1,7 @@
+[
+    {"itemName": "Milk", "checked": true, "qty": 1, "category": "Dariy" },
+    {"itemName": "Orange", "checked": false,  "qty": 6, "category": "Produce" },
+    {"itemName": "Ketchup", "checked": true, "qty": 1, "category": "Condiments" },
+    {"itemName": "Salt", "checked": false, "qty": 3, "category": "Baking/Spices" }
+  ]
+  
