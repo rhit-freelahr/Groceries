@@ -1,4 +1,12 @@
 [
-  {"name": "Salad", "ingredient": ["ham", "cheese"], "description": "i don't like a salad"}
+  {
+    "name": "Salad",
+    "ingredient": ["ham", "cheese"],
+    "description": "i don't like a salad"
+  },
+  {
+    "name": "juice",
+    "ingredient": ["orange", "ice"],
+    "description": "i don't like a salad"
+  }
 ]
-  
