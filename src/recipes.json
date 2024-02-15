@@ -7,7 +7,7 @@
           "itemName": "Ham",
           "checked": false,
           "qty": 1,
-          "category": "Meat"
+          "category": "Meat"    
         },
         {
           "itemName": "Cheese",
@@ -19,4 +19,3 @@
    "description": "i don't like a salad"
   }
 ]
-  
