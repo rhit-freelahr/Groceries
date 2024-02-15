@@ -1,4 +1,22 @@
 [
-  {"name": "Salad", "ingredient": ["ham", "cheese"], "description": "i don't like a salad"}
+  {
+    "name": "Salad",
+    "ingredients": 
+      [
+        {
+          "itemName": "Ham",
+          "checked": false,
+          "qty": 1,
+          "category": "Meat"
+        },
+        {
+          "itemName": "Cheese",
+          "checked": false,
+          "qty": 1,
+          "category": "Dairy"
+        }
+      ],
+   "description": "i don't like a salad"
+  }
 ]
   

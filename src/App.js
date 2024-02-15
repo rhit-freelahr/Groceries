@@ -117,8 +117,18 @@ function ProductTable({itemlist}) {
 function AddRecipe(){
 }
 
+function addGroceries (groceries) {
+  
+}
+
 function RecipeCard ({recipe}) {
   
+  const handleAddToGroceries = () => {
+    recipe.ingredients.forEach((ingredient) => {
+      console.log(ingredient)
+      addGroceries(ingredient)
+    })
+  }
   return(
     <>
       <Dialog.Root>
@@ -151,17 +161,18 @@ function RecipeCard ({recipe}) {
                 <hr/>
                 <h4>Ingredients:</h4>
                 <ul>
-                  {recipe.ingredient.map((ingredient, index) => (
+                  {recipe.ingredients.map((ingredient, index) => (
                       <label>
                         <input
                           type="checkbox"
                           name={`ingredient-${index}`}
-                          value={ingredient}
+                          value={ingredient.itemName}
                         />
-                        {ingredient}
+                        {ingredient.itemName}
                       </label>
                   ))}
                 </ul>
+                <Button onClick={handleAddToGroceries}>Add Ingredients to Groceries</Button>
             </Dialog.Content>
             </Dialog.Overlay>
           </Dialog.Portal>
