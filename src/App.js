@@ -276,6 +276,10 @@ function Groceries({ itemlist }) {
             <Box grow="3">
               <RecommendedRecipes recipes={recipes} />
             </Box>
+            
+            <Box grow="3">
+              <RecipeListTable recipes={recipes} />            
+            </Box>
           </ScrollArea>
         </Flex>
       </div>
@@ -285,33 +289,27 @@ function Groceries({ itemlist }) {
   );
 }
 
-function ProductRow({ item }) {
-  return (
-    <Theme>
-      <tr>
-        <td>
-          <Checkbox />
-        </td>
-        <td>{item.itemName}</td>
-        <td>{item.qty}</td>
-        <td>{item.category}</td>
-      </tr>
-    </Theme>
-  );
-}
 
 function ProductTable({ itemlist }) {
-  const rows = [];
+  const CheckboxRows = [];
+  const ItemRows = [];
+  const QtyRows = [];
+  const CategoryRows = [];
 
   itemlist.forEach((item) => {
-    rows.push(<ProductRow item={item} />);
+    CheckboxRows.push(item.checked);
+    ItemRows.push(item.itemName);
+    QtyRows.push(item.qty);
+    CategoryRows.push(item.category);
   });
+
+
   return (
     <Theme>
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Bought?</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Item</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Qty</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Category</Table.ColumnHeaderCell>
@@ -319,9 +317,14 @@ function ProductTable({ itemlist }) {
         </Table.Header>
 
         <Table.Body>
-          <Table.Row>
-            <Table.Cell>{rows}</Table.Cell>
-          </Table.Row>
+          {CheckboxRows.map((checkbox, index) => (
+            <Table.Row key={index}>
+              <Table.Cell><Checkbox/></Table.Cell>
+              <Table.Cell>{ItemRows[index]}</Table.Cell>
+              <Table.Cell>{QtyRows[index]}</Table.Cell>
+              <Table.Cell>{CategoryRows[index]}</Table.Cell>
+            </Table.Row>
+          ))}
         </Table.Body>
       </Table.Root>
     </Theme>
@@ -329,6 +332,43 @@ function ProductTable({ itemlist }) {
 }
 
 function AddRecipe() {}
+
+function RecipeListTable({ recipes }){
+  const RecipeNameRow = [];
+  const recipeIngredientRow = [];
+
+  recipes.forEach((rec) => {
+    RecipeNameRow.push(rec.name);
+    recipeIngredientRow.push(rec.ingredients.join(', '));
+  });
+
+  return(
+    <Theme>
+        <Text size="6" weight="bold">Recipe List</Text>
+      <Table.Root>
+        <Table.Header>
+         <Table.Row>
+          <Table.ColumnHeaderCell>Do you want this?</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>Recipe Name</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>Ingredient</Table.ColumnHeaderCell>
+        </Table.Row>
+      </Table.Header>
+
+        <Table.Body>
+          
+          {RecipeNameRow.map((name, index) => (
+            <Table.Row key={index}>
+              <Table.Cell><Checkbox/></Table.Cell>
+              <Table.Cell>{RecipeNameRow[index]}</Table.Cell>
+              <Table.Cell>{recipeIngredientRow[index]}</Table.Cell>
+            </Table.Row>
+          ))}
+
+        </Table.Body>
+      </Table.Root>
+    </Theme>
+  );
+}
 
 function RecipeCard({ recipe }) {
   if (!recipe || !recipe.name) {
