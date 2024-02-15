@@ -277,7 +277,7 @@ function Groceries({ itemlist }) {
             </Box>
 
             <Box grow="3">
-              {/* <RecommendedRecipes recipes={recipes} /> */}
+              <RecommendedRecipes recipes={recipes} />
             </Box>
             
             <Box grow="3">
@@ -389,16 +389,16 @@ function addGroceries (groceries) {
   
 }
 
-function RecipeCard ({recipe}) {
+function RecipeCard (recipe) {
   
   const handleAddToGroceries = () => {
     recipe.ingredients.forEach((ingredient) => {
       console.log(ingredient)
       addGroceries(ingredient)
     })
-    if (!recipe || !recipe.name) {
-      return null; // or some fallback UI
-    }
+    // if (!recipe || !recipe.name) {
+    //   return null; // or some fallback UI
+    // }
   }
   return (
     <>
@@ -453,17 +453,14 @@ function RecipeCard ({recipe}) {
 }
 
 function RecommendedRecipes({ recipes }) {
-  const recipesList = [];
-
-  recipes.forEach((rec) => {
-    recipesList.push(rec);
-  });
   return (
     <Theme>
       <Heading align="left">Recommended Recipes</Heading>
 
       <Flex gap="9">
-        <RecipeCard recipe={recipesList[0]} />
+        {recipes.map(recipe => {
+          return RecipeCard(recipe)
+        })}
       </Flex>
       <Button variant="outline">
         <svg
