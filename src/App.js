@@ -217,20 +217,23 @@ function Groceries() {
                       Add Recipe
                     </Button>
                   </Dialog.Trigger>
-                  <Dialog.Overlay />
-                  <Dialog.Content>
-                    <AddRecipe
-                      newRecipeName={newRecipeName}
-                      setNewRecipeName={setNewRecipeName}
-                      newIngredient={newIngredient}
-                      setNewIngredient={setNewIngredient}
-                      ingredientsList={ingredientsList}
-                      setIngredientsList={setIngredientsList}
-                      handleAddIngredient={handleAddIngredient}
-                      handleRemoveIngredient={handleRemoveIngredient}
-                      setIsAddRecipeDialogOpen={setIsAddRecipeDialogOpen}
-                    />
-                  </Dialog.Content>
+                  <Dialog.Portal>
+                    <Dialog.Overlay className="recipe-modal-overlay">
+                      <Dialog.Content className="recipe-modal">
+                        <AddRecipe
+                          newRecipeName={newRecipeName}
+                          setNewRecipeName={setNewRecipeName}
+                          newIngredient={newIngredient}
+                          setNewIngredient={setNewIngredient}
+                          ingredientsList={ingredientsList}
+                          setIngredientsList={setIngredientsList}
+                          handleAddIngredient={handleAddIngredient}
+                          handleRemoveIngredient={handleRemoveIngredient}
+                          setIsAddRecipeDialogOpen={setIsAddRecipeDialogOpen}
+                        />
+                    </Dialog.Content>
+                    </Dialog.Overlay>
+                  </Dialog.Portal>
                 </Dialog.Root>
               </div>
             </Box>
@@ -295,6 +298,10 @@ function ProductTable({ itemlist }) {
   );
 }
 
+async function deleteRecipe(recipe) {
+  await deleteDoc(doc(collection(db, 'recipes'), recipe.id));
+}
+
 function AddRecipe({
   newRecipeName,
   setNewRecipeName,
@@ -306,6 +313,8 @@ function AddRecipe({
   handleRemoveIngredient,
   setIsAddRecipeDialogOpen,
 }) {
+  const [newRecipeDescription, setNewRecipeDescription] = useState("");
+
   const handleAddRecipe = async () => {
     if (newRecipeName.trim() !== "" && ingredientsList.length > 0) {
       try {
@@ -321,6 +330,7 @@ function AddRecipe({
         const newRecipe = {
           name: newRecipeName.trim(),
           ingredients: ingredientsarr,
+          description: newRecipeDescription,
         };
 
         const docRef = await addDoc(collection(db, "recipes"), newRecipe);
@@ -383,12 +393,12 @@ function AddRecipe({
                 >
                   {ingredient}
                 </label>
-                <Button
+                <button
                   onClick={() => handleRemoveIngredient(index)}
                   style={{ marginLeft: "5px" }}
                 >
                   Remove
-                </Button>
+                </button>
               </div>
             ))}
           </div>
@@ -397,71 +407,26 @@ function AddRecipe({
             value={newIngredient}
             onChange={(e) => setNewIngredient(e.target.value)}
           />
-          <Button onClick={handleAddIngredient}>Add Ingredient</Button>
+          <button onClick={handleAddIngredient}>Add Ingredient</button>
         </label>
-
-        <Button onClick={handleAddRecipe}>Add Recipe</Button>
-        <Button onClick={() => setIsAddRecipeDialogOpen(false)}>Cancel</Button>
+        <label>
+          Recipe Description:
+            <input
+              type="text"
+              onChange={(e) => setNewRecipeDescription(e.target.value)}
+            />
+        </label>
+        <button onClick={handleAddRecipe}>Add Recipe</button>
+        <button onClick={() => setIsAddRecipeDialogOpen(false)}>Cancel</button>
       </Inset>
     </Card>
   );
 }
 
 
-// this is the old
-// function RecipeListTable({ recipes }) {
-//   const RecipeNameRow = [];
-//   const recipeIngredientRow = [];
-//   const descriptionRow = [];
+async function addGroceries (grocery) {
+  const docRef = await addDoc(collection(db, "groceries"), grocery);
 
-//   recipes.forEach((rec) => {
-//     RecipeNameRow.push(rec.name);
-//     rec.ingredients.forEach((ingredient) => {
-//       recipeIngredientRow.push(ingredient.itemName);
-//     });
-//   });
-
-//   const parseRecipe = (recipe) => {
-//     const ingredientsList = recipe.ingredients.map(
-//       (ingredient) => ingredient.itemName
-//     );
-//     return (
-//       <Table.Row>
-//         <Table.Cell>
-//           <Checkbox />
-//         </Table.Cell>
-//         <Table.Cell>{recipe.name}</Table.Cell>
-//         <Table.Cell>{ingredientsList.join(", ")}</Table.Cell>
-//         <Table.Cell> <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg></Table.Cell>
-//       </Table.Row>
-//     );
-//   };
-
-//   return (
-//     <Theme>
-//       <Text size="6" weight="bold">
-//         Recipe List
-//       </Text>
-//       <Table.Root>
-//         <Table.Header>
-//           <Table.Row>
-//             <Table.ColumnHeaderCell>Do you want this?</Table.ColumnHeaderCell>
-//             <Table.ColumnHeaderCell>Recipe Name</Table.ColumnHeaderCell>
-//             <Table.ColumnHeaderCell>Ingredient</Table.ColumnHeaderCell>
-//             <Table.ColumnHeaderCell> </Table.ColumnHeaderCell>
-//           </Table.Row>
-//         </Table.Header>
-//         <Table.Body>
-//           {recipes.map((recipe) => {
-//             return parseRecipe(recipe);
-//           })}
-//         </Table.Body>
-//       </Table.Root>
-//     </Theme>
-//   );
-// }
-
-function addGroceries (groceries) {
 }
 
 
@@ -597,7 +562,7 @@ function NavBar() {
   );
 }
 
-function RecipeCard(recipe) {
+function RecipeCard({recipe, canDelete}) {
   const handleAddToGroceries = () => {
     recipe.ingredients.forEach((ingredient) => {
       console.log(ingredient)
@@ -607,12 +572,15 @@ function RecipeCard(recipe) {
     //   return null; // or some fallback UI
     // }
   };
+  const handleDeleteIconClick = () => {
+    deleteRecipe(recipe)
+  }
   return (
     <>
       <Dialog.Root>
         <Dialog.Trigger className="recipe-button">
           <Box width="auto" height="30">
-            <Card size="2" style={{ maxWidth: 240 }}>
+            <Card size="2" style={{ width: 240 }}>
               <Inset clip="padding-box" side="top" pb="current">
                 <img
                   src="https://images.unsplash.com/photo-1617050318658-a9a3175e34cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
@@ -635,9 +603,11 @@ function RecipeCard(recipe) {
         <Dialog.Portal>
           <Dialog.Overlay className="recipe-modal-overlay">
             <Dialog.Content className="recipe-modal">
-              <h2>{recipe.name}</h2>
+              <h2 class="recipe-card-heading">{recipe.name}</h2>
               <hr />
-              <h4>Ingredients:</h4>
+              <h4>Description:</h4>
+              <p>{recipe.description}</p>
+              <h4 class="ingredients-card-heading">Ingredients:</h4>
               <ul>
                 {recipe.ingredients.map((ingredient, index) => (
                   <label>
@@ -650,9 +620,12 @@ function RecipeCard(recipe) {
                   </label>
                 ))}
               </ul>
-              <Button onClick={handleAddToGroceries}>
-                Add Ingredients to Groceries
-              </Button>
+              <button className="recipe-groceries" onClick={handleAddToGroceries} >
+                Add Groceries
+              </button>
+              {canDelete &&               
+                <svg onClick={handleDeleteIconClick}
+                style={{ cursor: 'pointer', float: 'right' }} width="30" height="30" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>}
             </Dialog.Content>
           </Dialog.Overlay>
         </Dialog.Portal>
@@ -661,16 +634,47 @@ function RecipeCard(recipe) {
   );
 }
 
+function blankCard() {
+  return (
+    <>
+    <div style={{padding: "0 118px"}} width="240px">&nbsp;</div>
+    </>
+  )
+}
+
 function RecommendedRecipes({ recipes }) {
+
+  const recipeMap = recipes => {
+    const mapped = recipes.map((recipe, index) => {
+      return <RecipeCard recipe={recipe} canDelete={true}/>
+    })
+    if(recipes.length % 3 == 0) {
+      return mapped
+    } else if(recipes.length %3 == 1) {
+      return (
+        <>
+        {mapped}
+        {blankCard()}
+        {blankCard()}
+        </>
+      )
+    } else {
+      return (
+        <>
+        {mapped}
+        {blankCard()}
+        </>
+      )
+    }
+  }
   return (
     <Theme>
-      <Heading align="left">Recommended Recipes</Heading>
-
-      <Flex gap="9">
-        {recipes.map((recipe, index) => {
-          if(index < 3) return RecipeCard(recipe)
-        })}
-      </Flex>
+      <div style={{textAlign:"center", maxWidth: "800px", margin: "0 auto"}}>
+        <Heading align="center">Recommended Recipes</Heading>
+            <Flex style={{justifyContent: "center", flexWrap: "wrap"}} gap="4">
+                {recipeMap(recipes)}
+              </Flex>
+      </div>
     </Theme>
   );
 }

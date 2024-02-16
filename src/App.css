@@ -44,13 +44,24 @@
   
 }
 
-
 .recipe-button, .recipe-button:hover, .recipe-button:focus {
   padding: 0;
   border-radius: inherit;
   background: none;
   color: black;
   border: none;
+}
+
+.recipe-groceries {
+  border-color: black;
+}
+
+.recipe-card-heading {
+  margin-bottom: 0;
+}
+
+.ingredients-card-heading {
+  margin-top: 0;
 }
 
 .recipe-modal {
@@ -64,6 +75,7 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   min-width: 600px;
   max-width: 1000px;
+  padding: 0px 30px;
 }
 
 .recipe-modal-overlay {
