@@ -1,6 +1,12 @@
 import { initializeApp } from "firebase/app";
 import { useEffect, useState } from "react";
-import { getFirestore, collection, getDocs, addDoc, setRecipes } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  setRecipes,
+} from "firebase/firestore";
 import logo from "./logo.svg";
 import "./App.css";
 import "@radix-ui/themes/styles.css";
@@ -23,8 +29,7 @@ import {
 import * as Dialog from "@radix-ui/react-dialog";
 import jsonData from "./data.json";
 // import recipeData from "./recipes.json";
-import { Cross2Icon } from '@radix-ui/react-icons';
-
+import { Cross2Icon } from "@radix-ui/react-icons";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhWDLSkP17o6ho4B9M0XB44-8gqRpiE7I",
@@ -100,45 +105,45 @@ function Groceries({ itemlist }) {
     setIngredientsList(updatedIngredientsList);
   };
 
-  const handleAddRecipe = async () => {
-    if (newRecipeName.trim() !== "" && ingredientsList.length > 0) {
-      try {
-        const ingredientsarr = []
-        for(const ingredient of ingredientsList) {
-          ingredientsarr.push({
-            itemName: ingredient,
-            checked: false,
-            qty: 1,
-            category: "test"
-          })
-        }
-        const newRecipe = {
-          name: newRecipeName.trim(),
-          ingredients: ingredientsarr,
-        };
+  // const handleAddRecipe = async () => {
+  //   if (newRecipeName.trim() !== "" && ingredientsList.length > 0) {
+  //     try {
+  //       const ingredientsarr = []
+  //       for(const ingredient of ingredientsList) {
+  //         ingredientsarr.push({
+  //           itemName: ingredient,
+  //           checked: false,
+  //           qty: 1,
+  //           category: "test"
+  //         })
+  //       }
+  //       const newRecipe = {
+  //         name: newRecipeName.trim(),
+  //         ingredients: ingredientsarr,
+  //       };
 
-        const docRef = await addDoc(collection(db, "recipes"), newRecipe);
+  //       const docRef = await addDoc(collection(db, "recipes"), newRecipe);
 
-        console.log("Document written with ID: ", docRef.id);
+  //       console.log("Document written with ID: ", docRef.id);
 
-        setIsAddRecipeDialogOpen(false);
-        setNewRecipeName("");
-        setNewIngredient("");
-        setIngredientsList([]);
-        console.log("New Recipe Added:", newRecipe);
-      } catch (error) {
-        console.error("Error adding document: ", error);
-      }
-    } else {
-      console.error("Please fill out all fields");
-    }
-  };
+  //       setIsAddRecipeDialogOpen(false);
+  //       setNewRecipeName("");
+  //       setNewIngredient("");
+  //       setIngredientsList([]);
+  //       console.log("New Recipe Added:", newRecipe);
+  //     } catch (error) {
+  //       console.error("Error adding document: ", error);
+  //     }
+  //   } else {
+  //     console.error("Please fill out all fields");
+  //   }
+  // };
 
   return (
     <Theme accentColor="gray">
       <div className="NavAndContent">
-        <Flex direction="column" m="5" >
-          <NavBar/>
+        <Flex direction="column" m="5">
+          <NavBar />
         </Flex>
 
         <Flex
@@ -150,10 +155,14 @@ function Groceries({ itemlist }) {
             {/* Title and quick view of grocery list */}
             <Box grow="3">
               <header>
-                <Heading align="center" m="5" mb="4">Qwik Groceries Generator </Heading>
+                <Heading align="center" m="5" mb="4">
+                  Qwik Groceries Generator{" "}
+                </Heading>
               </header>
               <Container size="3">
-                <Text size="3" weight="bold">Shopping List</Text>
+                <Text size="3" weight="bold">
+                  Shopping List
+                </Text>
                 <ProductTable itemlist={itemlist} />
               </Container>
             </Box>
@@ -184,73 +193,17 @@ function Groceries({ itemlist }) {
                   </Dialog.Trigger>
                   <Dialog.Overlay />
                   <Dialog.Content>
-                    <Card>
-                      <Inset>
-                        <Text as="h2">Create New Recipe</Text>
-                        <label>
-                          Recipe Name:
-                          <input
-                            type="text"
-                            value={newRecipeName}
-                            onChange={(e) => setNewRecipeName(e.target.value)}
-                          />
-                        </label>
-                        <label>
-                          Ingredients:
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}
-                          >
-                            {ingredientsList.map((ingredient, index) => (
-                              <div
-                                key={index}
-                                style={{
-                                  marginRight: "10px",
-                                  display: "flex",
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <input
-                                  type="checkbox"
-                                  id={`ingredient-${index}`}
-                                  checked={false}
-                                  style={{ marginRight: "5px" }}
-                                />
-                                <label
-                                  htmlFor={`ingredient-${index}`}
-                                  style={{ marginRight: "5px" }}
-                                >
-                                  {ingredient}
-                                </label>
-                                <Button
-                                  onClick={() => handleRemoveIngredient(index)}
-                                  style={{ marginLeft: "5px" }}
-                                >
-                                  Remove
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                          <input
-                            type="text"
-                            value={newIngredient}
-                            onChange={(e) => setNewIngredient(e.target.value)}
-                          />
-                          <Button onClick={handleAddIngredient}>
-                            Add Ingredient
-                          </Button>
-                        </label>
-
-                        <Button onClick={handleAddRecipe}>Add Recipe</Button>
-                        <Button onClick={handleCloseAddRecipeDialog}>
-                          Cancel
-                        </Button>
-                      </Inset>
-                    </Card>
+                    <AddRecipe
+                      newRecipeName={newRecipeName}
+                      setNewRecipeName={setNewRecipeName}
+                      newIngredient={newIngredient}
+                      setNewIngredient={setNewIngredient}
+                      ingredientsList={ingredientsList}
+                      setIngredientsList={setIngredientsList}
+                      handleAddIngredient={handleAddIngredient}
+                      handleRemoveIngredient={handleRemoveIngredient}
+                      setIsAddRecipeDialogOpen={setIsAddRecipeDialogOpen}
+                    />
                   </Dialog.Content>
                 </Dialog.Root>
               </div>
@@ -259,8 +212,8 @@ function Groceries({ itemlist }) {
             <Box grow="3">
               <RecommendedRecipes recipes={recipes} />
             </Box>
-            
-            <Box grow ="3">
+
+            <Box grow="3">
               <RecipeListDisplay recipes={recipes} />
             </Box>
           </ScrollArea>
@@ -271,7 +224,6 @@ function Groceries({ itemlist }) {
     </Theme>
   );
 }
-
 
 function ProductTable({ itemlist }) {
   const CheckboxRows = [];
@@ -285,7 +237,6 @@ function ProductTable({ itemlist }) {
     QtyRows.push(item.qty);
     CategoryRows.push(item.category);
   });
-
 
   return (
     <Theme>
@@ -302,7 +253,9 @@ function ProductTable({ itemlist }) {
         <Table.Body>
           {CheckboxRows.map((checkbox, index) => (
             <Table.Row key={index}>
-              <Table.Cell><Checkbox/></Table.Cell>
+              <Table.Cell>
+                <Checkbox />
+              </Table.Cell>
               <Table.Cell>{ItemRows[index]}</Table.Cell>
               <Table.Cell>{QtyRows[index]}</Table.Cell>
               <Table.Cell>{CategoryRows[index]}</Table.Cell>
@@ -314,50 +267,160 @@ function ProductTable({ itemlist }) {
   );
 }
 
-function AddRecipe() {}
+function AddRecipe({
+  newRecipeName,
+  setNewRecipeName,
+  newIngredient,
+  setNewIngredient,
+  ingredientsList,
+  setIngredientsList,
+  handleAddIngredient,
+  handleRemoveIngredient,
+  setIsAddRecipeDialogOpen,
+}) {
+  const handleAddRecipe = async () => {
+    if (newRecipeName.trim() !== "" && ingredientsList.length > 0) {
+      try {
+        const ingredientsarr = [];
+        for (const ingredient of ingredientsList) {
+          ingredientsarr.push({
+            itemName: ingredient,
+            checked: false,
+            qty: 1,
+            category: "test",
+          });
+        }
+        const newRecipe = {
+          name: newRecipeName.trim(),
+          ingredients: ingredientsarr,
+        };
 
-function RecipeListTable({ recipes }){
+        const docRef = await addDoc(collection(db, "recipes"), newRecipe);
+
+        console.log("Document written with ID: ", docRef.id);
+
+        setIsAddRecipeDialogOpen(false);
+        setNewRecipeName("");
+        setNewIngredient("");
+        setIngredientsList([]);
+        console.log("New Recipe Added:", newRecipe);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    } else {
+      console.error("Please fill out all fields");
+    }
+  };
+
+  return (
+    <Card>
+      <Inset>
+        <Text as="h2">Create New Recipe</Text>
+        <label>
+          Recipe Name:
+          <input
+            type="text"
+            value={newRecipeName}
+            onChange={(e) => setNewRecipeName(e.target.value)}
+          />
+        </label>
+        <label>
+          Ingredients:
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            {ingredientsList.map((ingredient, index) => (
+              <div
+                key={index}
+                style={{
+                  marginRight: "10px",
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  id={`ingredient-${index}`}
+                  checked={false}
+                  style={{ marginRight: "5px" }}
+                />
+                <label
+                  htmlFor={`ingredient-${index}`}
+                  style={{ marginRight: "5px" }}
+                >
+                  {ingredient}
+                </label>
+                <Button
+                  onClick={() => handleRemoveIngredient(index)}
+                  style={{ marginLeft: "5px" }}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+          <input
+            type="text"
+            value={newIngredient}
+            onChange={(e) => setNewIngredient(e.target.value)}
+          />
+          <Button onClick={handleAddIngredient}>Add Ingredient</Button>
+        </label>
+
+        <Button onClick={handleAddRecipe}>Add Recipe</Button>
+        <Button onClick={() => setIsAddRecipeDialogOpen(false)}>Cancel</Button>
+      </Inset>
+    </Card>
+  );
+}
+
+function RecipeListTable({ recipes }) {
   const RecipeNameRow = [];
   const recipeIngredientRow = [];
 
   recipes.forEach((rec) => {
     RecipeNameRow.push(rec.name);
-    rec.ingredients.forEach(ingredient => {
+    rec.ingredients.forEach((ingredient) => {
       recipeIngredientRow.push(ingredient.itemName);
-    })
+    });
   });
 
   const parseRecipe = (recipe) => {
-    const ingredientsList = recipe.ingredients.map(ingredient => ingredient.itemName);
-      return (
+    const ingredientsList = recipe.ingredients.map(
+      (ingredient) => ingredient.itemName
+    );
+    return (
       <Table.Row>
         <Table.Cell>
-          <Checkbox/>
+          <Checkbox />
         </Table.Cell>
-        <Table.Cell>
-          {recipe.name}
-        </Table.Cell>
-        <Table.Cell>
-          {ingredientsList.join(", ")}
-        </Table.Cell>
+        <Table.Cell>{recipe.name}</Table.Cell>
+        <Table.Cell>{ingredientsList.join(", ")}</Table.Cell>
       </Table.Row>
-    )
-  } 
+    );
+  };
 
-  return(
+  return (
     <Theme>
-        <Text size="6" weight="bold">Recipe List</Text>
+      <Text size="6" weight="bold">
+        Recipe List
+      </Text>
       <Table.Root>
         <Table.Header>
-         <Table.Row>
-          <Table.ColumnHeaderCell>Do you want this?</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell>Recipe Name</Table.ColumnHeaderCell>
-          <Table.ColumnHeaderCell>Ingredient</Table.ColumnHeaderCell>
-        </Table.Row>
-      </Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Do you want this?</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Recipe Name</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Ingredient</Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
         <Table.Body>
-          {recipes.map(recipe => {
-            return parseRecipe(recipe)
+          {recipes.map((recipe) => {
+            return parseRecipe(recipe);
           })}
         </Table.Body>
       </Table.Root>
@@ -365,81 +428,98 @@ function RecipeListTable({ recipes }){
   );
 }
 
-function addGroceries (groceries) {
+function addGroceries(groceries) {}
+
+function RecipeListDisplay({ recipes }) {
+  return (
+    <Theme>
+      <Dialog.Root>
+        <Dialog.Trigger asChild>
+          <Button variant="outline">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 15 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
+                fill="currentColor"
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            View more recipes
+          </Button>
+        </Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay className="DialogOverlay" />
+          <Dialog.Content className="DialogContent">
+            <RecipeListTable recipes={recipes} />
+            <div
+              style={{
+                display: "flex",
+                marginTop: 25,
+                justifyContent: "flex-end",
+              }}
+            ></div>
+            <Dialog.Close asChild>
+              <button className="IconButton" aria-label="Close">
+                <Cross2Icon />
+              </button>
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </Theme>
+  );
 }
 
-function RecipeListDisplay ({ recipes }){
-  return(  
-  <Theme>
-  <Dialog.Root>
-    <Dialog.Trigger asChild>
-      <Button variant="outline">
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 15 15"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
-            fill="currentColor"
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-          ></path>
-        </svg>
-        View more recipes
-      </Button>
-
-    </Dialog.Trigger>
-    <Dialog.Portal>
-      <Dialog.Overlay className="DialogOverlay" />
-      <Dialog.Content className="DialogContent">
-        <RecipeListTable recipes={recipes} />
-        <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end' }}>
-        </div>
-        <Dialog.Close asChild>
-          <button className="IconButton" aria-label="Close">
-            <Cross2Icon />
-          </button>
-        </Dialog.Close>
-      </Dialog.Content>
-    </Dialog.Portal>
-  </Dialog.Root>
-  </Theme>
-)
-}
-
-function NavBar (){
-  return(
+function NavBar() {
+  return (
     <Theme>
       <Flex direction="column">
-      <Text size="8" weight="bold"> Quik Groceries</Text>
+        <Text size="8" weight="bold">
+          {" "}
+          Quik Groceries
+        </Text>
 
-      <Separator my="3" size="9" />
+        <Separator my="3" size="9" />
 
-      <Text size="6" weight="bold" mb="3">Home</Text>
-      <Text size="6" weight="bold" mb="3">Shopping List</Text>
-      <Text size="6" weight="bold" mb="3">Add Recipe</Text>
-      <Text size="6" weight="bold" mb="3">View Recipe</Text>
-      <Text size="6" weight="bold" mb="3">Profile</Text>
-      <Text size="6" weight="bold" mb="3">About us</Text>
+        <Text size="6" weight="bold" mb="3">
+          Home
+        </Text>
+        <Text size="6" weight="bold" mb="3">
+          Shopping List
+        </Text>
+        <Text size="6" weight="bold" mb="3">
+          Add Recipe
+        </Text>
+        <Text size="6" weight="bold" mb="3">
+          View Recipe
+        </Text>
+        <Text size="6" weight="bold" mb="3">
+          Profile
+        </Text>
+        <Text size="6" weight="bold" mb="3">
+          About us
+        </Text>
       </Flex>
     </Theme>
-  )
+  );
 }
 
-function RecipeCard (recipe) {
-  
+function RecipeCard(recipe) {
   const handleAddToGroceries = () => {
     recipe.ingredients.forEach((ingredient) => {
-      console.log(ingredient)
-      addGroceries(ingredient)
-    })
+      console.log(ingredient);
+      addGroceries(ingredient);
+    });
     // if (!recipe || !recipe.name) {
     //   return null; // or some fallback UI
     // }
-  }
+  };
   return (
     <>
       <Dialog.Root>
@@ -466,24 +546,26 @@ function RecipeCard (recipe) {
           </Box>
         </Dialog.Trigger>
         <Dialog.Portal>
-            <Dialog.Overlay className='recipe-modal-overlay'>
-            <Dialog.Content className='recipe-modal' >
-                <h2>{recipe.name}</h2>
-                <hr/>
-                <h4>Ingredients:</h4>
-                <ul>
-                  {recipe.ingredients.map((ingredient, index) => (
-                      <label>
-                        <input
-                          type="checkbox"
-                          name={`ingredient-${index}`}
-                          value={ingredient.itemName}
-                        />
-                        {ingredient.itemName}
-                      </label>
-                  ))}
-                </ul>
-                <Button onClick={handleAddToGroceries}>Add Ingredients to Groceries</Button>
+          <Dialog.Overlay className="recipe-modal-overlay">
+            <Dialog.Content className="recipe-modal">
+              <h2>{recipe.name}</h2>
+              <hr />
+              <h4>Ingredients:</h4>
+              <ul>
+                {recipe.ingredients.map((ingredient, index) => (
+                  <label>
+                    <input
+                      type="checkbox"
+                      name={`ingredient-${index}`}
+                      value={ingredient.itemName}
+                    />
+                    {ingredient.itemName}
+                  </label>
+                ))}
+              </ul>
+              <Button onClick={handleAddToGroceries}>
+                Add Ingredients to Groceries
+              </Button>
             </Dialog.Content>
           </Dialog.Overlay>
         </Dialog.Portal>
@@ -498,8 +580,8 @@ function RecommendedRecipes({ recipes }) {
       <Heading align="left">Recommended Recipes</Heading>
 
       <Flex gap="9">
-        {recipes.map(recipe => {
-          return RecipeCard(recipe)
+        {recipes.map((recipe) => {
+          return RecipeCard(recipe);
         })}
       </Flex>
     </Theme>
