@@ -126,7 +126,7 @@ function Groceries() {
 
   const handleAddIngredient = () => {
 
-    if(newIngredient.itemName && newIngredient.qty) {
+    if(newIngredient.itemName && newIngredient.qty && newIngredient.category) {
 
     }
     ingredientsList.push(newIngredient)
@@ -307,6 +307,7 @@ function ProductTable({ itemlist }) {
 
 let currentIngredientName = ""
 let currentIngredientQuantity = 0
+let currentIngredientCategory = ""
 async function deleteRecipe(recipe) {
   await deleteDoc(doc(collection(db, 'recipes'), recipe.id)).then(() => {
     window.location.reload()
@@ -361,6 +362,7 @@ function AddRecipe({
         setIngredientsList([]);
         currentIngredientName = "";
         currentIngredientQuantity = 1;
+        currentIngredientCategory = "";
         console.log("New Recipe Added:", newRecipe);
       } catch (error) {
         console.error("Error adding document: ", error);
@@ -424,6 +426,7 @@ function AddRecipe({
           <Table.Row>
             <Table.ColumnHeaderCell>Ingredients Input</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Quantity Input</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Category Input</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -435,7 +438,7 @@ function AddRecipe({
               onChange={(e) => {
                 currentIngredientName = e.target.value
                 setNewIngredient({
-                  category: "aa",
+                  category: currentIngredientCategory,
                   checked: false,
                   qty: currentIngredientQuantity,
                   itemName: currentIngredientName
@@ -450,7 +453,22 @@ function AddRecipe({
               onChange={(e) =>  {
                 currentIngredientQuantity = e.target.value
                 setNewIngredient({
-                  category: "aa",
+                  category: currentIngredientCategory,
+                  checked: false,
+                  qty: currentIngredientQuantity,
+                  itemName: currentIngredientName
+                })
+              }}
+            />
+            </Table.Cell>
+            <Table.Cell>
+              <input
+              type="text"
+              value={newIngredient.category} 
+              onChange={(e) =>  {
+                currentIngredientCategory = e.target.value
+                setNewIngredient({
+                  category: currentIngredientCategory, 
                   checked: false,
                   qty: currentIngredientQuantity,
                   itemName: currentIngredientName
