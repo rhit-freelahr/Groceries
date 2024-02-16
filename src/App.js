@@ -66,7 +66,12 @@ export { Label, Input, Textarea };
 function Groceries() {
   const [isAddRecipeDialogOpen, setIsAddRecipeDialogOpen] = useState(false);
   const [newRecipeName, setNewRecipeName] = useState("");
-  const [newIngredient, setNewIngredient] = useState("");
+  const [newIngredient, setNewIngredient] = useState({
+     category: "",
+     checked: false,
+     qty: "",
+     itemName: ""
+  });
   const [ingredientsList, setIngredientsList] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [groceries, setGroceries] = useState([]);
@@ -106,15 +111,26 @@ function Groceries() {
   const handleCloseAddRecipeDialog = () => {
     setIsAddRecipeDialogOpen(false);
     setNewRecipeName("");
-    setNewIngredient("");
+    setNewIngredient({
+      category: "",
+      checked: false,
+      qty: "",
+      itemName: ""
+   });
     setIngredientsList([]);
   };
 
   const handleAddIngredient = () => {
-    if (newIngredient.trim() !== "") {
-      setIngredientsList([...ingredientsList, newIngredient.trim()]);
-      setNewIngredient(""); // Clear input field after adding ingredient
-    }
+
+    ingredientsList.push(newIngredient)
+
+      setIngredientsList(ingredientsList);
+      setNewIngredient({
+        category: "",
+        checked: false,
+        qty: "",
+        itemName: ""
+     }); // Clear input field after adding ingredient
   };
 
   const handleRemoveIngredient = (index) => {
@@ -122,40 +138,6 @@ function Groceries() {
     updatedIngredientsList.splice(index, 1);
     setIngredientsList(updatedIngredientsList);
   };
-
-  // const handleAddRecipe = async () => {
-  //   if (newRecipeName.trim() !== "" && ingredientsList.length > 0) {
-  //     try {
-  //       const ingredientsarr = []
-  //       for(const ingredient of ingredientsList) {
-  //         ingredientsarr.push({
-  //           itemName: ingredient,
-  //           checked: false,
-  //           qty: 1,
-  //           category: "test"
-  //         })
-  //       }
-  //       const newRecipe = {
-  //         name: newRecipeName.trim(),
-  //         ingredients: ingredientsarr,
-  //       };
-
-  //       const docRef = await addDoc(collection(db, "recipes"), newRecipe);
-
-  //       console.log("Document written with ID: ", docRef.id);
-
-  //       setIsAddRecipeDialogOpen(false);
-  //       setNewRecipeName("");
-  //       setNewIngredient("");
-  //       setIngredientsList([]);
-  //       console.log("New Recipe Added:", newRecipe);
-  //     } catch (error) {
-  //       console.error("Error adding document: ", error);
-  //     }
-  //   } else {
-  //     console.error("Please fill out all fields");
-  //   }
-  // };
 
   return (
 
@@ -198,8 +180,8 @@ function Groceries() {
                   open={isAddRecipeDialogOpen}
                   onOpenChange={setIsAddRecipeDialogOpen}
                 >
-                  <Dialog.Trigger className="recipe-button">
-                    <Button style={{ padding: 0 }}>
+                  <Dialog.Trigger className="recipe-button" style={{width: "100%"}}>
+                    <Button style={{ padding: "5px 10px", width: "90%" }}>
                       <svg
                         width="15"
                         height="15"
@@ -238,9 +220,9 @@ function Groceries() {
               </div>
             </Box>
 
-            <Box grow="3">
+            {/* <Box grow="3">
               <RecommendedRecipes recipes={recipes} />
-            </Box>
+            </Box> */}
 
             <Box grow="3" my="5">
               <RecipeListDisplay recipes={recipes} />
@@ -298,6 +280,8 @@ function ProductTable({ itemlist }) {
   );
 }
 
+let currentIngredientName = ""
+let currentIngredientQuantity = ""
 async function deleteRecipe(recipe) {
   await deleteDoc(doc(collection(db, 'recipes'), recipe.id));
 }
@@ -315,17 +299,14 @@ function AddRecipe({
 }) {
   const [newRecipeDescription, setNewRecipeDescription] = useState("");
 
+
   const handleAddRecipe = async () => {
     if (newRecipeName.trim() !== "" && ingredientsList.length > 0) {
       try {
         const ingredientsarr = [];
         for (const ingredient of ingredientsList) {
-          ingredientsarr.push({
-            itemName: ingredient,
-            checked: false,
-            qty: 1,
-            category: "test",
-          });
+          console.log(ingredient)
+          ingredientsarr.push(ingredient);
         }
         const newRecipe = {
           name: newRecipeName.trim(),
@@ -339,8 +320,15 @@ function AddRecipe({
 
         setIsAddRecipeDialogOpen(false);
         setNewRecipeName("");
-        setNewIngredient("");
+        setNewIngredient({
+          category: "",
+          checked: false,
+          qty: "",
+          itemName: ""
+       });
         setIngredientsList([]);
+        currentIngredientName = "";
+        currentIngredientQuantity = 1;
         console.log("New Recipe Added:", newRecipe);
       } catch (error) {
         console.error("Error adding document: ", error);
@@ -362,53 +350,89 @@ function AddRecipe({
             onChange={(e) => setNewRecipeName(e.target.value)}
           />
         </label>
-        <label>
-          Ingredients:
-          <div
+        <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Ingredients</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Quantity</Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+        <div
             style={{
               display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
+              flexWrap: "wrap",
+              margin: "0 auto",
             }}
           >
             {ingredientsList.map((ingredient, index) => (
               <div
                 key={index}
                 style={{
-                  marginRight: "10px",
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
+                  textAlign: "center",
+
                 }}
               >
-                <input
-                  type="checkbox"
-                  id={`ingredient-${index}`}
-                  checked={false}
-                  style={{ marginRight: "5px" }}
-                />
-                <label
-                  htmlFor={`ingredient-${index}`}
-                  style={{ marginRight: "5px" }}
-                >
-                  {ingredient}
-                </label>
                 <button
-                  onClick={() => handleRemoveIngredient(index)}
-                  style={{ marginLeft: "5px" }}
+                  onClick={() => handleRemoveIngredient(index)} className="new-recipe-button-red"
+                  style={{ }}
                 >
-                  Remove
+                  {ingredient.itemName}
                 </button>
               </div>
-            ))}
+            ))} 
           </div>
-          <input
-            type="text"
-            value={newIngredient}
-            onChange={(e) => setNewIngredient(e.target.value)}
-          />
-          <button onClick={handleAddIngredient}>Add Ingredient</button>
-        </label>
+          </Table.Body>
+        </Table.Root>
+
+        <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell>Ingredients Input</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Quantity Input</Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>
+              <input
+              type="text"
+              value={newIngredient.itemName}
+              onChange={(e) => {
+                currentIngredientName = e.target.value
+                setNewIngredient({
+                  category: "aa",
+                  checked: false,
+                  qty: currentIngredientQuantity,
+                  itemName: currentIngredientName
+                })
+              }}
+            />
+            </Table.Cell>
+            <Table.Cell>
+              <input
+              type="text"
+              value={newIngredient.qty} 
+              onChange={(e) =>  {
+                currentIngredientQuantity = e.target.value
+                setNewIngredient({
+                  category: "aa",
+                  checked: false,
+                  qty: currentIngredientQuantity,
+                  itemName: currentIngredientName
+                })
+              }}
+            />
+            </Table.Cell>
+
+          </Table.Row>
+
+        </Table.Body>
+        </Table.Root>
+          <button onClick={handleAddIngredient} className="new-recipe-button-gray">Add Ingredient</button>
         <label>
           Recipe Description:
             <input
@@ -416,8 +440,8 @@ function AddRecipe({
               onChange={(e) => setNewRecipeDescription(e.target.value)}
             />
         </label>
-        <button onClick={handleAddRecipe}>Add Recipe</button>
-        <button onClick={() => setIsAddRecipeDialogOpen(false)}>Cancel</button>
+        <button onClick={handleAddRecipe} className="new-recipe-button-gray">Add Recipe</button>
+        <button onClick={() => setIsAddRecipeDialogOpen(false)} className="new-recipe-button-gray" style={{float: "right"}}>Cancel</button>
       </Inset>
     </Card>
   );
@@ -586,9 +610,6 @@ function RecipeCard({recipe, canDelete}) {
       console.log(ingredient)
       addGroceries(ingredient)
     })
-    // if (!recipe || !recipe.name) {
-    //   return null; // or some fallback UI
-    // }
   };
   const handleDeleteIconClick = () => {
     deleteRecipe(recipe)
