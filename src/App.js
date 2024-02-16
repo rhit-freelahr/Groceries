@@ -23,6 +23,8 @@ import {
 import * as Dialog from "@radix-ui/react-dialog";
 import jsonData from "./data.json";
 // import recipeData from "./recipes.json";
+import { Cross2Icon } from '@radix-ui/react-icons';
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhWDLSkP17o6ho4B9M0XB44-8gqRpiE7I",
@@ -135,31 +137,8 @@ function Groceries({ itemlist }) {
   return (
     <Theme accentColor="gray">
       <div className="NavAndContent">
-        <Flex direction="column" m="5">
-          <Text size="6" weight="bold">
-            Quik Groceries
-          </Text>
-
-          <Separator my="3" size="9" />
-
-          <Text size="6" weight="bold">
-            Home
-          </Text>
-          <Text size="6" weight="bold">
-            Shopping List
-          </Text>
-          <Text size="6" weight="bold">
-            Add Recipe
-          </Text>
-          <Text size="6" weight="bold">
-            View Recipe
-          </Text>
-          <Text size="6" weight="bold">
-            Profile
-          </Text>
-          <Text size="6" weight="bold">
-            About us
-          </Text>
+        <Flex direction="column" m="5" >
+          <NavBar/>
         </Flex>
 
         <Flex
@@ -171,9 +150,10 @@ function Groceries({ itemlist }) {
             {/* Title and quick view of grocery list */}
             <Box grow="3">
               <header>
-                <Heading color="cyan">Qwik Groceries Generator</Heading>
+                <Heading align="center" m="5" mb="4">Qwik Groceries Generator </Heading>
               </header>
               <Container size="3">
+                <Text size="3" weight="bold">Shopping List</Text>
                 <ProductTable itemlist={itemlist} />
               </Container>
             </Box>
@@ -280,8 +260,8 @@ function Groceries({ itemlist }) {
               <RecommendedRecipes recipes={recipes} />
             </Box>
             
-            <Box grow="3">
-              <RecipeListTable recipes={recipes} />            
+            <Box grow ="3">
+              <RecipeListDisplay recipes={recipes} />
             </Box>
           </ScrollArea>
         </Flex>
@@ -386,7 +366,67 @@ function RecipeListTable({ recipes }){
 }
 
 function addGroceries (groceries) {
-  
+}
+
+function RecipeListDisplay ({ recipes }){
+  return(  
+  <Theme>
+  <Dialog.Root>
+    <Dialog.Trigger asChild>
+      <Button variant="outline">
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 15 15"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
+            fill="currentColor"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        View more recipes
+      </Button>
+
+    </Dialog.Trigger>
+    <Dialog.Portal>
+      <Dialog.Overlay className="DialogOverlay" />
+      <Dialog.Content className="DialogContent">
+        <RecipeListTable recipes={recipes} />
+        <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end' }}>
+        </div>
+        <Dialog.Close asChild>
+          <button className="IconButton" aria-label="Close">
+            <Cross2Icon />
+          </button>
+        </Dialog.Close>
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog.Root>
+  </Theme>
+)
+}
+
+function NavBar (){
+  return(
+    <Theme>
+      <Flex direction="column">
+      <Text size="8" weight="bold"> Quik Groceries</Text>
+
+      <Separator my="3" size="9" />
+
+      <Text size="6" weight="bold" mb="3">Home</Text>
+      <Text size="6" weight="bold" mb="3">Shopping List</Text>
+      <Text size="6" weight="bold" mb="3">Add Recipe</Text>
+      <Text size="6" weight="bold" mb="3">View Recipe</Text>
+      <Text size="6" weight="bold" mb="3">Profile</Text>
+      <Text size="6" weight="bold" mb="3">About us</Text>
+      </Flex>
+    </Theme>
+  )
 }
 
 function RecipeCard (recipe) {
@@ -462,23 +502,6 @@ function RecommendedRecipes({ recipes }) {
           return RecipeCard(recipe)
         })}
       </Flex>
-      <Button variant="outline">
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 15 15"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
-            fill="currentColor"
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-          ></path>
-        </svg>
-        View more recipes
-      </Button>
     </Theme>
   );
 }
