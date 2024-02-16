@@ -6,6 +6,8 @@ import {
   getDocs,
   addDoc,
   setRecipes,
+  deleteDoc,
+  doc
 } from "firebase/firestore";
 import logo from "./logo.svg";
 import "./App.css";
@@ -29,7 +31,8 @@ import {
 import * as Dialog from "@radix-ui/react-dialog";
 // import jsonData from "./data.json";
 // import recipeData from "./recipes.json";
-import { Cross2Icon } from "@radix-ui/react-icons";
+
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhWDLSkP17o6ho4B9M0XB44-8gqRpiE7I",
@@ -155,18 +158,26 @@ function Groceries() {
   // };
 
   return (
+
     <Theme accentColor="gray">
       <div className="NavAndContent">
+
         <Flex direction="column" m="5">
+          <div style={{position: "fixed"}} >
           <NavBar />
+          </div>
         </Flex>
 
         <Flex
           direction="column"
           gap="3"
-          style={{ background: "var(--gray-a4)" }}
+          style={{
+
+            background: "var(--gray-a4)",
+
+          }}
         >
-          <ScrollArea type="always" scrollbars="vertical">
+
             {/* Title and quick view of grocery list */}
             <Box grow="3">
               <header>
@@ -228,15 +239,17 @@ function Groceries() {
               <RecommendedRecipes recipes={recipes} />
             </Box>
 
-            <Box grow="3">
+            <Box grow="3" my="5">
               <RecipeListDisplay recipes={recipes} />
             </Box>
-          </ScrollArea>
+
         </Flex>
+
       </div>
 
       <div className="App"></div>
     </Theme>
+
   );
 }
 
@@ -394,35 +407,111 @@ function AddRecipe({
   );
 }
 
-function RecipeListTable({ recipes }) {
-  const RecipeNameRow = [];
-  const recipeIngredientRow = [];
 
-  recipes.forEach((rec) => {
-    RecipeNameRow.push(rec.name);
-    rec.ingredients.forEach((ingredient) => {
-      recipeIngredientRow.push(ingredient.itemName);
-    });
-  });
+// this is the old
+// function RecipeListTable({ recipes }) {
+//   const RecipeNameRow = [];
+//   const recipeIngredientRow = [];
+//   const descriptionRow = [];
+
+//   recipes.forEach((rec) => {
+//     RecipeNameRow.push(rec.name);
+//     rec.ingredients.forEach((ingredient) => {
+//       recipeIngredientRow.push(ingredient.itemName);
+//     });
+//   });
+
+//   const parseRecipe = (recipe) => {
+//     const ingredientsList = recipe.ingredients.map(
+//       (ingredient) => ingredient.itemName
+//     );
+//     return (
+//       <Table.Row>
+//         <Table.Cell>
+//           <Checkbox />
+//         </Table.Cell>
+//         <Table.Cell>{recipe.name}</Table.Cell>
+//         <Table.Cell>{ingredientsList.join(", ")}</Table.Cell>
+//         <Table.Cell> <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg></Table.Cell>
+//       </Table.Row>
+//     );
+//   };
+
+//   return (
+//     <Theme>
+//       <Text size="6" weight="bold">
+//         Recipe List
+//       </Text>
+//       <Table.Root>
+//         <Table.Header>
+//           <Table.Row>
+//             <Table.ColumnHeaderCell>Do you want this?</Table.ColumnHeaderCell>
+//             <Table.ColumnHeaderCell>Recipe Name</Table.ColumnHeaderCell>
+//             <Table.ColumnHeaderCell>Ingredient</Table.ColumnHeaderCell>
+//             <Table.ColumnHeaderCell> </Table.ColumnHeaderCell>
+//           </Table.Row>
+//         </Table.Header>
+//         <Table.Body>
+//           {recipes.map((recipe) => {
+//             return parseRecipe(recipe);
+//           })}
+//         </Table.Body>
+//       </Table.Root>
+//     </Theme>
+//   );
+// }
+
+function addGroceries (groceries) {
+}
+
+
+function RecipeListTable({ recipes, setRecipes }) {
+  const [recipeToDelete, setRecipeToDelete] = useState(null);
+
+  const handleDeleteIconClick = (recipe) => {
+    setRecipeToDelete(recipe);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      // Delete the recipe from Firebase
+      await deleteDoc(doc(collection(db, 'recipes'), recipeToDelete.id));
+
+      // Update the local state to reflect the deletion
+      setRecipes((prevRecipes) => prevRecipes.filter((rec) => rec.id !== recipeToDelete.id));
+
+      // Clear the recipeToDelete state
+      setRecipeToDelete(null);
+    } catch (error) {
+      console.error('Error deleting recipe:', error.message);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setRecipeToDelete(null);
+  };
 
   const parseRecipe = (recipe) => {
-    const ingredientsList = recipe.ingredients.map(
-      (ingredient) => ingredient.itemName
-    );
+    const ingredientsList = recipe.ingredients.map((ingredient) => ingredient.itemName);
+
     return (
-      <Table.Row>
+      <Table.Row key={recipe.id}>
         <Table.Cell>
           <Checkbox />
         </Table.Cell>
         <Table.Cell>{recipe.name}</Table.Cell>
-        <Table.Cell>{ingredientsList.join(", ")}</Table.Cell>
+        <Table.Cell>{ingredientsList.join(', ')}</Table.Cell>
+        <Table.Cell>
+          <svg onClick={() => handleDeleteIconClick(recipe)}
+            style={{ cursor: 'pointer' }} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+        </Table.Cell>
       </Table.Row>
     );
   };
 
   return (
     <Theme>
-      <Text size="6" weight="bold">
+      <Text size="6" weight="bold" align = "center">
         Recipe List
       </Text>
       <Table.Root>
@@ -431,47 +520,31 @@ function RecipeListTable({ recipes }) {
             <Table.ColumnHeaderCell>Do you want this?</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Recipe Name</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Ingredient</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
-        <Table.Body>
-          {recipes.map((recipe) => {
-            return parseRecipe(recipe);
-          })}
-        </Table.Body>
+        <Table.Body>{recipes.map((recipe) => parseRecipe(recipe))}</Table.Body>
       </Table.Root>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog.Root open={recipeToDelete !== null} onClose={handleDeleteCancel}>
+        
+        <Dialog.Content>
+          <Text size="6" weight="bold">Confirm Deletion</Text>
+          <Text>Are you sure you want to delete the recipe?</Text>
+          <button onClick={handleDeleteConfirm}>Yes</button>
+          <button onClick={handleDeleteCancel}>No</button>
+        </Dialog.Content>
+      </Dialog.Root>
+
     </Theme>
   );
 }
 
-function addGroceries (groceries) {
-}
-
+// this is old one in dialog
 function RecipeListDisplay({ recipes }) {
   return (
     <Theme>
-      <Dialog.Root>
-        <Dialog.Trigger asChild>
-          <Button variant="outline">
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 15 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
-                fill="currentColor"
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            View more recipes
-          </Button>
-        </Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Overlay className="DialogOverlay" />
-          <Dialog.Content className="DialogContent">
             <RecipeListTable recipes={recipes} />
             <div
               style={{
@@ -480,25 +553,22 @@ function RecipeListDisplay({ recipes }) {
                 justifyContent: "flex-end",
               }}
             ></div>
-            <Dialog.Close asChild>
-              <button className="IconButton" aria-label="Close">
-                <Cross2Icon />
-              </button>
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+
     </Theme>
   );
 }
 
+
+
 function NavBar() {
   return (
+
     <Theme>
       <Flex direction="column">
         <Text size="8" weight="bold">
-          {" "}
-          Quik Groceries
+          
+          Quik <br></br>Groceries
+          <svg width="25" height="25" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.69667 0.0403541C8.90859 0.131038 9.03106 0.354857 8.99316 0.582235L8.0902 6.00001H12.5C12.6893 6.00001 12.8625 6.10701 12.9472 6.27641C13.0319 6.4458 13.0136 6.6485 12.8999 6.80001L6.89997 14.8C6.76167 14.9844 6.51521 15.0503 6.30328 14.9597C6.09135 14.869 5.96888 14.6452 6.00678 14.4178L6.90974 9H2.49999C2.31061 9 2.13748 8.893 2.05278 8.72361C1.96809 8.55422 1.98636 8.35151 2.09999 8.2L8.09997 0.200038C8.23828 0.0156255 8.48474 -0.0503301 8.69667 0.0403541ZM3.49999 8.00001H7.49997C7.64695 8.00001 7.78648 8.06467 7.88148 8.17682C7.97648 8.28896 8.01733 8.43723 7.99317 8.5822L7.33027 12.5596L11.5 7.00001H7.49997C7.353 7.00001 7.21347 6.93534 7.11846 6.8232C7.02346 6.71105 6.98261 6.56279 7.00678 6.41781L7.66968 2.44042L3.49999 8.00001Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
         </Text>
 
         <Separator my="3" size="9" />
@@ -513,8 +583,9 @@ function NavBar() {
           Add Recipe
         </Text>
         <Text size="6" weight="bold" mb="3">
-          View Recipe
+        View Recipe
         </Text>
+
         <Text size="6" weight="bold" mb="3">
           Profile
         </Text>
