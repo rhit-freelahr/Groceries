@@ -288,7 +288,7 @@ function ProductTable({ itemlist }) {
                 <Checkbox onClick={ async (e) =>  {
                   const checked = e.target.getAttribute("data-state") == "checked"
                   await editGroceries(grocery, !checked)
-                }} checked={grocery.checked}/>
+                }} defaultChecked={grocery.checked}/>
               </Table.Cell>
               <Table.Cell>{grocery.itemName}</Table.Cell>
               <Table.Cell>{grocery.qty}</Table.Cell>
