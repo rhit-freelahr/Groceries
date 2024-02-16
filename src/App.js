@@ -4,7 +4,9 @@ import {
   getFirestore,
   collection,
   getDocs,
+  getDoc,
   addDoc,
+  setDoc,
   setRecipes,
   deleteDoc,
   doc
@@ -114,7 +116,7 @@ function Groceries() {
     setNewIngredient({
       category: "",
       checked: false,
-      qty: "",
+      qty: 0,
       itemName: ""
    });
     setIngredientsList([]);
@@ -122,13 +124,16 @@ function Groceries() {
 
   const handleAddIngredient = () => {
 
+    if(newIngredient.itemName && newIngredient.qty) {
+
+    }
     ingredientsList.push(newIngredient)
 
       setIngredientsList(ingredientsList);
       setNewIngredient({
         category: "",
         checked: false,
-        qty: "",
+        qty: 0,
         itemName: ""
      }); // Clear input field after adding ingredient
   };
@@ -239,17 +244,26 @@ function Groceries() {
 }
 
 function ProductTable({ itemlist }) {
-  const CheckboxRows = [];
-  const ItemRows = [];
-  const QtyRows = [];
-  const CategoryRows = [];
+  const handleDeleteGroceries = (grocery) => {
+    deleteGroceries(grocery)
+  }
 
-  itemlist.forEach((item) => {
-    CheckboxRows.push(item.checked);
-    ItemRows.push(item.itemName);
-    QtyRows.push(item.qty);
-    CategoryRows.push(item.category);
-  });
+  const editGroceries = async (grocery, e) => {
+    const collect = collection(db, "groceries");
+    const ref = doc(collect, grocery.id)
+    const data = {
+      category: grocery.category,
+      checked: e,
+      qty: grocery.qty,
+      itemName: grocery.itemName,
+    }
+    await setDoc(ref, data)
+  }
+
+  const isChecked = async (grocery) => {
+    const snap = collection(db, 'groceries')
+    console.log(snap)
+  }
 
   return (
     <Theme>
@@ -264,14 +278,21 @@ function ProductTable({ itemlist }) {
         </Table.Header>
 
         <Table.Body>
-          {CheckboxRows.map((checkbox, index) => (
+          {itemlist.map((grocery, index) => (
             <Table.Row key={index}>
               <Table.Cell>
-                <Checkbox />
+                <Checkbox onClick={ async (e) =>  {
+                  const checked = e.target.getAttribute("data-state") == "checked"
+                  await editGroceries(grocery, !checked)
+                }} checked={grocery.checked}/>
               </Table.Cell>
-              <Table.Cell>{ItemRows[index]}</Table.Cell>
-              <Table.Cell>{QtyRows[index]}</Table.Cell>
-              <Table.Cell>{CategoryRows[index]}</Table.Cell>
+              <Table.Cell>{grocery.itemName}</Table.Cell>
+              <Table.Cell>{grocery.qty}</Table.Cell>
+              <Table.Cell>{grocery.category}</Table.Cell>
+              <Table.Cell>
+                <svg onClick={() => handleDeleteGroceries(grocery)}
+                style={{ cursor: 'pointer' }} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
@@ -281,7 +302,7 @@ function ProductTable({ itemlist }) {
 }
 
 let currentIngredientName = ""
-let currentIngredientQuantity = ""
+let currentIngredientQuantity = 0
 async function deleteRecipe(recipe) {
   await deleteDoc(doc(collection(db, 'recipes'), recipe.id));
 }
@@ -313,17 +334,18 @@ function AddRecipe({
           ingredients: ingredientsarr,
           description: newRecipeDescription,
         };
+        console.log(ingredientsarr)
 
-        const docRef = await addDoc(collection(db, "recipes"), newRecipe);
-
-        console.log("Document written with ID: ", docRef.id);
+        addDoc(collection(db, "recipes"), newRecipe).then(() => {
+          // window.location.reload()
+        })
 
         setIsAddRecipeDialogOpen(false);
         setNewRecipeName("");
         setNewIngredient({
           category: "",
           checked: false,
-          qty: "",
+          qty: 0,
           itemName: ""
        });
         setIngredientsList([]);
@@ -447,6 +469,13 @@ function AddRecipe({
   );
 }
 
+function deleteGroceries (grocery) {
+  deleteDoc(doc(collection(db, "groceries"), grocery.id)).then(() => {
+    window.location.reload()
+  })
+
+}
+
 
 async function addGroceries (grocery) {
   const docRef = await addDoc(collection(db, "groceries"), grocery);
@@ -479,24 +508,6 @@ function RecipeListTable({ recipes, setRecipes }) {
   const handleDeleteCancel = () => {
     setRecipeToDelete(null);
   };
-
-  // const parseRecipe = (recipe) => {
-  //   const ingredientsList = recipe.ingredients.map((ingredient) => ingredient.itemName);
-
-  //   return (
-  //     <Table.Row key={recipe.id}>
-  //       <Table.Cell>
-  //         <Checkbox />
-  //       </Table.Cell>
-  //       <Table.Cell>{recipe.name}</Table.Cell>
-  //       <Table.Cell>{ingredientsList.join(', ')}</Table.Cell>
-  //       <Table.Cell>
-  //         <svg onClick={() => handleDeleteIconClick(recipe)}
-  //           style={{ cursor: 'pointer' }} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-  //       </Table.Cell>
-  //     </Table.Row>
-  //   );
-  // };
 
   const recipeMap = recipes => {
     const mapped = recipes.map((recipe, index) => {
