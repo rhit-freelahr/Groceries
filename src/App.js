@@ -652,10 +652,16 @@ function NavBar() {
 
 function RecipeCard({ recipe, canDelete }) {
   const handleAddToGroceries = () => {
-    recipe.ingredients.forEach((ingredient) => {
-      console.log(ingredient);
-      addGroceries(ingredient);
-    });
+    const promises = []
+
+    recipe.ingredients.forEach(async (ingredient) => {
+      promises.push(addGroceries(ingredient));
+    }); 
+    Promise.all(promises)
+  .then(() => {
+    // Once all promises are resolved, reload the page
+    window.location.reload();
+  })
   };
 
   const handleDeleteIconClick = () => {
