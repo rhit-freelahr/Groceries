@@ -710,7 +710,7 @@ function RecipeCard({ recipe, canDelete }) {
                       style={{marginRight: "5px"}}
                       value={ingredient.itemName}
                     />
-                    {ingredient.itemName}
+                    {`${ingredient.itemName} | ${ingredient.qty}`}
                   </label>
                 ))}
               </ul>
