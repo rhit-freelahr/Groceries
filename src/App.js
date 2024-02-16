@@ -149,20 +149,20 @@ function Groceries() {
   return (
 
     <Theme accentColor="gray">
-      <div className="NavAndContent">
+      {/* <div className="NavAndContent"> */}
 
-        <Flex direction="column" m="5">
+        {/* <Flex direction="column" m="5">
           <div style={{position: "fixed"}} >
           <NavBar />
           </div>
-        </Flex>
+        </Flex> */}
 
         <Flex
           direction="column"
           gap="3"
           style={{
 
-            background: "var(--gray-a4)",
+            background: "#faf3ec",
 
           }}
         >
@@ -239,7 +239,7 @@ function Groceries() {
 
         </Flex>
 
-      </div>
+      {/* </div> */}
 
       <div className="App"></div>
     </Theme>
@@ -308,7 +308,9 @@ function ProductTable({ itemlist }) {
 let currentIngredientName = ""
 let currentIngredientQuantity = 0
 async function deleteRecipe(recipe) {
-  await deleteDoc(doc(collection(db, 'recipes'), recipe.id));
+  await deleteDoc(doc(collection(db, 'recipes'), recipe.id)).then(() => {
+    window.location.reload()
+  })
 }
 
 function AddRecipe({
@@ -384,7 +386,6 @@ function AddRecipe({
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>Ingredients</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Quantity</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -495,8 +496,7 @@ function deleteGroceries (grocery) {
 
 
 async function addGroceries (grocery) {
-  const docRef = await addDoc(collection(db, "groceries"), grocery);
-
+  await addDoc(collection(db, "groceries"), grocery);
 }
 
 
@@ -683,6 +683,7 @@ function RecipeCard({ recipe, canDelete }) {
                     <input
                       type="checkbox"
                       name={`ingredient-${index}`}
+                      style={{marginRight: "5px"}}
                       value={ingredient.itemName}
                     />
                     {ingredient.itemName}
