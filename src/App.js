@@ -55,12 +55,13 @@ const Textarea = ({ value, onChange, placeholder, rows }) => (
 
 export { Label, Input, Textarea };
 
-function Groceries({ itemlist }) {
+function Groceries() {
   const [isAddRecipeDialogOpen, setIsAddRecipeDialogOpen] = useState(false);
   const [newRecipeName, setNewRecipeName] = useState("");
   const [newIngredient, setNewIngredient] = useState("");
   const [ingredientsList, setIngredientsList] = useState([]);
   const [recipes, setRecipes] = useState([]);
+  const [groceries, setGroceries] = useState([]);
 
   useEffect(() => {
     const getRecipes = async () => {
@@ -74,6 +75,20 @@ function Groceries({ itemlist }) {
     };
 
     getRecipes();
+  }, []);
+
+  useEffect(() => {
+    const getGroceries = async () => {
+      const groceriesCollection = collection(db, "groceries");
+      const groceriesSnapshot = await getDocs(groceriesCollection);
+      const groceriesData = groceriesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setGroceries(groceriesData);
+    };
+
+    getGroceries();
   }, []);
 
   const handleOpenAddRecipeDialog = () => {
@@ -154,7 +169,7 @@ function Groceries({ itemlist }) {
               </header>
               <Container size="3">
                 <Text size="3" weight="bold">Shopping List</Text>
-                <ProductTable itemlist={itemlist} />
+                <ProductTable itemlist={groceries} />
               </Container>
             </Box>
             <Box grow="3">
@@ -365,7 +380,8 @@ function RecipeListTable({ recipes }){
   );
 }
 
-function addGroceries (groceries) {
+async function addGroceries (groecery) {
+  const docRef = await addDoc(collection(db, "groceries"), groecery);
 }
 
 function RecipeListDisplay ({ recipes }){
@@ -433,7 +449,6 @@ function RecipeCard (recipe) {
   
   const handleAddToGroceries = () => {
     recipe.ingredients.forEach((ingredient) => {
-      console.log(ingredient)
       addGroceries(ingredient)
     })
     // if (!recipe || !recipe.name) {
@@ -498,8 +513,8 @@ function RecommendedRecipes({ recipes }) {
       <Heading align="left">Recommended Recipes</Heading>
 
       <Flex gap="9">
-        {recipes.map(recipe => {
-          return RecipeCard(recipe)
+        {recipes.map((recipe, index) => {
+          if(index < 3) return RecipeCard(recipe)
         })}
       </Flex>
     </Theme>
@@ -507,5 +522,6 @@ function RecommendedRecipes({ recipes }) {
 }
 
 export default function App() {
-  return <Groceries itemlist={jsonData} />;
+  
+  return <Groceries/>;
 }
