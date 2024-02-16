@@ -68,6 +68,7 @@ export { Label, Input, Textarea };
 function Groceries() {
   const [isAddRecipeDialogOpen, setIsAddRecipeDialogOpen] = useState(false);
   const [newRecipeName, setNewRecipeName] = useState("");
+  const [newRecipePhoto, setNewRecipePhoto] = useState("");
   const [newIngredient, setNewIngredient] = useState({
      category: "",
      checked: false,
@@ -113,6 +114,7 @@ function Groceries() {
   const handleCloseAddRecipeDialog = () => {
     setIsAddRecipeDialogOpen(false);
     setNewRecipeName("");
+    setNewRecipePhoto("");
     setNewIngredient({
       category: "",
       checked: false,
@@ -210,6 +212,8 @@ function Groceries() {
                         <AddRecipe
                           newRecipeName={newRecipeName}
                           setNewRecipeName={setNewRecipeName}
+                          newRecipePhoto={newRecipePhoto}
+                          setNewRecipePhoto={setNewRecipePhoto}
                           newIngredient={newIngredient}
                           setNewIngredient={setNewIngredient}
                           ingredientsList={ingredientsList}
@@ -310,6 +314,8 @@ async function deleteRecipe(recipe) {
 function AddRecipe({
   newRecipeName,
   setNewRecipeName,
+  newRecipePhoto,
+  setNewRecipePhoto,
   newIngredient,
   setNewIngredient,
   ingredientsList,
@@ -331,6 +337,7 @@ function AddRecipe({
         }
         const newRecipe = {
           name: newRecipeName.trim(),
+          photo: newRecipePhoto.trim(),
           ingredients: ingredientsarr,
           description: newRecipeDescription,
         };
@@ -342,6 +349,7 @@ function AddRecipe({
 
         setIsAddRecipeDialogOpen(false);
         setNewRecipeName("");
+        setNewRecipePhoto("");
         setNewIngredient({
           category: "",
           checked: false,
@@ -461,6 +469,15 @@ function AddRecipe({
               type="text"
               onChange={(e) => setNewRecipeDescription(e.target.value)}
             />
+        </label>
+
+        <label>
+        Recipe Photo link (Optional):
+        <input
+          type="text"
+          value={newRecipePhoto}
+          onChange={(e) => setNewRecipePhoto(e.target.value)}
+        />
         </label>
         <button onClick={handleAddRecipe} className="new-recipe-button-gray">Add Recipe</button>
         <button onClick={() => setIsAddRecipeDialogOpen(false)} className="new-recipe-button-gray" style={{float: "right"}}>Cancel</button>
@@ -615,16 +632,18 @@ function NavBar() {
   );
 }
 
-function RecipeCard({recipe, canDelete}) {
+function RecipeCard({ recipe, canDelete }) {
   const handleAddToGroceries = () => {
     recipe.ingredients.forEach((ingredient) => {
-      console.log(ingredient)
-      addGroceries(ingredient)
-    })
+      console.log(ingredient);
+      addGroceries(ingredient);
+    });
   };
+
   const handleDeleteIconClick = () => {
-    deleteRecipe(recipe)
-  }
+    deleteRecipe(recipe);
+  };
+
   return (
     <>
       <Dialog.Root>
@@ -633,8 +652,8 @@ function RecipeCard({recipe, canDelete}) {
             <Card size="2" style={{ width: 240 }}>
               <Inset clip="padding-box" side="top" pb="current">
                 <img
-                  src="https://images.unsplash.com/photo-1617050318658-a9a3175e34cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
-                  alt="Bold typography"
+                  src={recipe.photo || "https://images.unsplash.com/photo-1617050318658-a9a3175e34cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"}
+                  alt="Recipe"
                   style={{
                     display: "block",
                     objectFit: "cover",
@@ -653,7 +672,7 @@ function RecipeCard({recipe, canDelete}) {
         <Dialog.Portal>
           <Dialog.Overlay className="recipe-modal-overlay">
             <Dialog.Content className="recipe-modal">
-              <h2 class="recipe-card-heading">{recipe.name}</h2>
+            <h2 class="recipe-card-heading">{recipe.name}</h2>
               <hr />
               <h4>Description:</h4>
               <p>{recipe.description}</p>
