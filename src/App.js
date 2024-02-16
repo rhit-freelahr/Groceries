@@ -500,12 +500,9 @@ function RecipeListTable({ recipes, setRecipes }) {
 
   return (
     <Theme>
-      <Text size="6" weight="bold" align = "center">
-        Recipe List
-      </Text>
       <Theme>
       <div style={{textAlign:"center", maxWidth: "800px", margin: "0 auto"}}>
-        <Heading align="center">Recommended Recipes</Heading>
+        <Heading align="center">Your Recipes</Heading>
             <Flex style={{justifyContent: "center", flexWrap: "wrap"}} gap="4">
                 {recipeMap(recipes)}
               </Flex>
